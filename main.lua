@@ -18,6 +18,7 @@ function love.load()
     objects.ground = ObjectMaker.create({
         body = love.physics.newBody(world, 800/2, 400-50/2),
         shape = love.physics.newRectangleShape(800, 50),
+        color = {0, 0, 0},
         zindex = -10
     })
 
@@ -41,6 +42,6 @@ function love.draw()
     love.graphics.setBackgroundColor(1,1,1)
     love.graphics.setColor(0,0,0)
     love.graphics.draw(cursorImage, cursorPos.x, cursorPos.y)
-    love.graphics.print(cursorSpeed, 400, 100)
+    love.graphics.print(love.timer.getFPS(), 400, 100)
     ObjectMaker.renderObjects()
 end

@@ -10,11 +10,12 @@ function module.create(data)
     assert(data.body and data.shape, "A body/shape is missing")
     local newObject = setmetatable({}, object)
     newObject.uid = lastUid + 1
+    newObject.zindex = data.zindex or 0
     newObject.body = data.body
     newObject.shape = data.shape
-    newObject.zindex = data.zindex or 0
-    newObject.image = data.image or nil
     newObject.fixture = love.physics.newFixture(data.body, data.shape, data.density or 1)
+    newObject.image = data.image or nil
+    newObject.color = data.color or {0, 0, 0}
     table.insert(createdObjects, newObject)
     sorted = false
     return newObject
@@ -35,6 +36,8 @@ function module.renderObjects()
     for _, obj in pairs(createdObjects) do
         local x = obj.body:getX()
         local y = obj.body:getY()
+
+        love.graphics.setColor(obj.color)
 
         if obj.image then
             love.graphics.draw(obj.image, x, y, body:getAngle())
