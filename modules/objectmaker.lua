@@ -50,6 +50,8 @@ function module.renderObjects()
             love.graphics.polygon("fill", obj.body:getWorldPoints(obj.shape:getPoints()))
         elseif obj.shape:getType() == "circle" then
             love.graphics.circle("fill", x, y, obj.shape:getRadius())
+        else
+            love.graphics.line(body:getWorldPoints(shape:getPoints()))
         end
     end
 end
