@@ -14,7 +14,6 @@ local world
 local objects = {}
 
 function love.load()
-    love.window.setMode(800, 400)
     love.window.setVSync(1)
     love.physics.setMeter(32)
     world = love.physics.newWorld(0, 9.81*32, true)
