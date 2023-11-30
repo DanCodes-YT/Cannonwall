@@ -1,3 +1,5 @@
+local Vector2 = require "vector2"
+
 local module = {}
 local createdObjects = {}
 local sorted = false
@@ -40,7 +42,10 @@ function module.renderObjects()
         love.graphics.setColor(obj.color)
 
         if obj.image then
-            love.graphics.draw(obj.image, x, y, body:getAngle())
+            local angle = obj.body:getAngle()
+
+            love.graphics.draw(obj.image, x, y, angle, 1, 1, obj.image:getWidth()/2, obj.image:getHeight()/2)
+            love.graphics.polygon("line", obj.body:getWorldPoints(obj.shape:getPoints()))
         elseif obj.shape:getType() == "polygon" then
             love.graphics.polygon("fill", obj.body:getWorldPoints(obj.shape:getPoints()))
         elseif obj.shape:getType() == "circle" then
