@@ -37,6 +37,16 @@ function love.load()
         image = cursorImage,
         zindex = -10
     })
+    objects.cursor.fixture:setRestitution(0.5)
+
+    for i = 1, 5, 1 do
+        objects["wall"..i] = ObjectMaker.create({
+            body = love.physics.newBody(world, 800/2, 40 * i, "dynamic"),
+            shape = love.physics.newRectangleShape(20, 30),
+            color = {0, 0, 0},
+            zindex = -10
+        })
+    end
 
     objects.cursor.body:setAngle(math.rad(50))
 end
@@ -46,12 +56,12 @@ function love.update(dt)
 
     if love.mouse.isDown({1}) then
         lastMousePosition = Vector2.new(love.mouse.getX(), love.mouse.getY())
-        objects.cursor.body:applyForce(0, -3000)
+        local direction = (lastMousePosition - Vector2.new(objects.cursor.body:getX(), objects.cursor.body:getY())).unit
+        objects.cursor.body:applyForce(direction.x * 1000, direction.y * 2000)
     end
     local lastCursorPos = cursorPos
     cursorPos = cursorPos:Lerp(Vector2.new(lastMousePosition.x - 24, lastMousePosition.y - 24), 1 - 0.0005 ^ dt)
     cursorSpeed = math.floor((lastCursorPos - cursorPos).magnitude)
-    --objects.cursor.body:setPosition(cursorPos.x, cursorPos.y)
 end
 
 function love.draw()

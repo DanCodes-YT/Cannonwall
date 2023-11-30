@@ -2,28 +2,16 @@ local Vector2 = {}
 
 function Vector2.new(x, y)
   local mt = {}
-  local unit,magnitude
 
   x = x or 0
   y = y or 0
 
   function mt:__index(i)
     if i == "magnitude" then
-      if not magnitude then
-        magnitude = (x*x + y*y)^.5
-      end
-
-      return magnitude
+      return (x*x + y*y)^.5
     elseif i == "unit" then
-      if not magnitude then
-        magnitude = self.magnitude
-      end
-
-      if not unit then
-        unit = Vector2.new(x/magnitude, y/magnitude)
-      end
-
-      return unit
+      local magnitude = self.magnitude
+      return Vector2.new(x/magnitude, y/magnitude)
     elseif i == "x" then
       return x
     elseif i == "y" then
