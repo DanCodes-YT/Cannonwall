@@ -5,6 +5,7 @@ io.stdout:setvbuf('no')
 local globals = require "modules.globals"
 local Vector2 = globals.Vector2
 local ObjectMaker = globals.ObjectMaker
+local Gamera = globals.Gamera
 
 local cursorImage
 local cursorPos
@@ -12,10 +13,12 @@ local cursorSpeed
 local lastMousePosition
 local world
 local objects = {}
+local camera
 
 function love.load()
     love.physics.setMeter(32)
     world = love.physics.newWorld(0, 9.81*32, true)
+    camera = Gamera.new(0, 0, 800, 400)
 
     cursorImage = love.graphics.newImage("assets/images/cursor.png")
     
@@ -68,5 +71,7 @@ function love.draw()
     love.graphics.setBackgroundColor(1,1,1)
     love.graphics.setColor(0,0,0)
     love.graphics.print(love.timer.getFPS(), 400, 100)
-    ObjectMaker.renderObjects()
+    camera:draw(function()
+        ObjectMaker.renderObjects()
+    end)
 end
