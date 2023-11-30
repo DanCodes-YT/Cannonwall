@@ -1,4 +1,4 @@
-local Vector2 = require "vector2"
+local Vector2 = require "modules.vector2"
 
 local module = {}
 local createdObjects = {}

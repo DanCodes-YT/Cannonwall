@@ -2,7 +2,7 @@
 -- Windows: ALT + L
 io.stdout:setvbuf('no')
 
-local globals = require "globals"
+local globals = require "modules.globals"
 local Vector2 = globals.Vector2
 local ObjectMaker = globals.ObjectMaker
 
@@ -15,10 +15,11 @@ local objects = {}
 
 function love.load()
     love.window.setMode(800, 400)
+    love.window.setVSync(1)
     love.physics.setMeter(32)
     world = love.physics.newWorld(0, 9.81*32, true)
 
-    cursorImage = love.graphics.newImage("cursor.png")
+    cursorImage = love.graphics.newImage("assets/images/cursor.png")
     
     lastMousePosition = Vector2.new(400, 200)
     cursorPos = Vector2.new(0, 0)
@@ -47,7 +48,7 @@ function love.update(dt)
 
     if love.mouse.isDown({1}) then
         lastMousePosition = Vector2.new(love.mouse.getX(), love.mouse.getY())
-        objects.cursor.body:applyForce(0, -1000)
+        objects.cursor.body:applyForce(0, -3000)
     end
     local lastCursorPos = cursorPos
     cursorPos = cursorPos:Lerp(Vector2.new(lastMousePosition.x - 24, lastMousePosition.y - 24), 1 - 0.0005 ^ dt)
@@ -58,7 +59,6 @@ end
 function love.draw()
     love.graphics.setBackgroundColor(1,1,1)
     love.graphics.setColor(0,0,0)
-    --love.graphics.draw(cursorImage, cursorPos.x, cursorPos.y)
     love.graphics.print(love.timer.getFPS(), 400, 100)
     ObjectMaker.renderObjects()
 end
