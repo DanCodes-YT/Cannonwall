@@ -16,8 +16,8 @@ local objects = {}
 local camera
 
 function love.load()
-    love.physics.setMeter(32)
-    world = love.physics.newWorld(0, 9.81*32, true)
+    love.physics.setMeter(24)
+    world = love.physics.newWorld(0, 9.81*24, true)
     camera = Gamera.new(0, 0, 800, 400)
 
     cursorImage = love.graphics.newImage("assets/images/cursor.png")
@@ -58,7 +58,8 @@ function love.update(dt)
     world:update(dt)
 
     if love.mouse.isDown({1}) then
-        lastMousePosition = Vector2.new(love.mouse.getX(), love.mouse.getY())
+        local mx, my = camera:toWorld(love.mouse.getX(), love.mouse.getY())
+        lastMousePosition =  Vector2.new(mx, my)
         local direction = (lastMousePosition - Vector2.new(objects.cursor.body:getX(), objects.cursor.body:getY())).unit
         objects.cursor.body:applyForce(direction.x * 1000, direction.y * 2000)
     end
@@ -68,6 +69,7 @@ function love.update(dt)
 end
 
 function love.draw()
+    camera:setWindow(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     love.graphics.setBackgroundColor(1,1,1)
     love.graphics.setColor(0,0,0)
     love.graphics.print(love.timer.getFPS(), 400, 100)
