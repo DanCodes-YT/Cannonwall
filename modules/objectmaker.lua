@@ -23,7 +23,23 @@ function module.create(data)
     return newObject
 end
 
-function module.renderObjects()
+function object:destroy(shape)
+    if self.destroyed then return end
+
+    self.destroyed = true
+    self.body:destroy()
+
+    if shape then
+        self.shape:release()
+    end
+
+    setmetatable(self, nil)
+end
+
+function module.renderObjects(l, t, w, h)
+    w = w + l
+    h = h + t
+
     if not sorted then
         table.sort(createdObjects, function(a, b)
             if a.zindex == b.zindex then
@@ -35,15 +51,23 @@ function module.renderObjects()
         sorted = true
     end
 
-    for _, obj in pairs(createdObjects) do
+    for i, obj in pairs(createdObjects) do
+        if obj.destroyed then
+            table.remove(createdObjects, i)
+            goto continue
+        end
+
+        local angle = obj.body:getAngle()
         local x = obj.body:getX()
         local y = obj.body:getY()
+        local tlx, tly, brx, bry = obj.shape:computeAABB(x, y, angle)
+        
+        local topLeft = Vector2.new(tlx, tly)
+        local bottomRight = Vector2.new(brx, bry)
 
         love.graphics.setColor(obj.color)
 
         if obj.image then
-            local angle = obj.body:getAngle()
-
             love.graphics.draw(obj.image, x, y, angle, 1, 1, obj.image:getWidth()/2, obj.image:getHeight()/2)
             love.graphics.polygon("line", obj.body:getWorldPoints(obj.shape:getPoints()))
         elseif obj.shape:getType() == "polygon" then
@@ -51,8 +75,9 @@ function module.renderObjects()
         elseif obj.shape:getType() == "circle" then
             love.graphics.circle("fill", x, y, obj.shape:getRadius())
         else
-            love.graphics.line(body:getWorldPoints(shape:getPoints()))
+            love.graphics.line(obj.body:getWorldPoints(obj.shape:getPoints()))
         end
+        ::continue::
     end
 end
 

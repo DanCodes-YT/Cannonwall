@@ -2,10 +2,13 @@
 -- Windows: ALT + L
 io.stdout:setvbuf('no')
 
-local globals = require "modules.globals"
-local Vector2 = globals.Vector2
-local ObjectMaker = globals.ObjectMaker
-local Gamera = globals.Gamera
+local conf = require "conf"
+local vector2 = require "modules.vector2"
+local objectMaker = require "modules.objectmaker"
+local gamera = require "modules.gamera"
+
+local windowSize = conf.windowSize
+local currentWindowSize = vector2.new(windowSize.x, windowSize.y)
 
 local cursorImage
 local cursorPos
@@ -18,22 +21,15 @@ local camera
 function love.load()
     love.physics.setMeter(24)
     world = love.physics.newWorld(0, 9.81*24, true)
-    camera = Gamera.new(0, 0, 800, 400)
+    camera = gamera.new(0, 0, windowSize.x, windowSize.y)
 
     cursorImage = love.graphics.newImage("assets/images/cursor.png")
     
-    lastMousePosition = Vector2.new(400, 200)
-    cursorPos = Vector2.new(0, 0)
+    lastMousePosition = vector2.new(400, 200)
+    cursorPos = vector2.new(0, 0)
     cursorSpeed = 0
 
-    objects.ground = ObjectMaker.create({
-        body = love.physics.newBody(world, 800/2, 400-50/2),
-        shape = love.physics.newRectangleShape(800, 50),
-        color = {0.1, 0.1, 0.1},
-        zindex = -10
-    })
-
-    objects.cursor = ObjectMaker.create({
+    objects.cursor = objectMaker.create({
         body = love.physics.newBody(world, lastMousePosition.x - 24, lastMousePosition.y - 24, "dynamic"),
         shape = love.physics.newRectangleShape(48, 48),
         color = {0, 0, 0},
@@ -42,38 +38,68 @@ function love.load()
     })
     objects.cursor.fixture:setRestitution(0.5)
 
-    for i = 1, 5, 1 do
-        objects["wall"..i] = ObjectMaker.create({
-            body = love.physics.newBody(world, 800/2, 40 * i, "dynamic"),
-            shape = love.physics.newRectangleShape(20, 30),
+    objects.border1 = objectMaker.create({
+        body = love.physics.newBody(world, 0, 200),
+        shape = love.physics.newEdgeShape(0, 200, 0, -200),
+        color = {0, 0, 0}
+    })
+
+    objects.border2 = objectMaker.create({
+        body = love.physics.newBody(world, 800, 200),
+        shape = love.physics.newEdgeShape(0, 200, 0, -200),
+        color = {0, 0, 0}
+    })
+
+    objects.border3 = objectMaker.create({
+        body = love.physics.newBody(world, 400, 0),
+        shape = love.physics.newEdgeShape(-400, 0, 400, 0),
+        color = {0, 0, 0}
+    })
+
+    objects.border4 = objectMaker.create({
+        body = love.physics.newBody(world, 400, 400),
+        shape = love.physics.newEdgeShape(-400, 0, 400, 0),
+        color = {0, 0, 0}
+    })
+
+    for i = 1, 200, 1 do
+        local newObject = objectMaker.create({
+            body = love.physics.newBody(world, 800/2, 100, "dynamic"),
+            shape = love.physics.newRectangleShape(math.random(10, 30), math.random(20, 40)),
             color = {0, 0, 0},
             zindex = -10
         })
+        newObject.fixture:setRestitution(0.3)
+        objects["wall"..i] = newObject
     end
 
     objects.cursor.body:setAngle(math.rad(50))
 end
 
 function love.update(dt)
-    world:update(dt)
-
     if love.mouse.isDown({1}) then
         local mx, my = camera:toWorld(love.mouse.getX(), love.mouse.getY())
-        lastMousePosition =  Vector2.new(mx, my)
-        local direction = (lastMousePosition - Vector2.new(objects.cursor.body:getX(), objects.cursor.body:getY())).unit
-        objects.cursor.body:applyForce(direction.x * 1000, direction.y * 2000)
+        lastMousePosition =  vector2.new(mx, my)
+        local direction = (lastMousePosition - vector2.new(objects.cursor.body:getX(), objects.cursor.body:getY())).unit
+        objects.cursor.body:applyForce(direction.x * 30000, direction.y * 30000)
     end
     local lastCursorPos = cursorPos
-    cursorPos = cursorPos:Lerp(Vector2.new(lastMousePosition.x - 24, lastMousePosition.y - 24), 1 - 0.0005 ^ dt)
+    cursorPos = cursorPos:Lerp(vector2.new(lastMousePosition.x - 24, lastMousePosition.y - 24), 1 - 0.0005 ^ dt)
     cursorSpeed = math.floor((lastCursorPos - cursorPos).magnitude)
+    world:update(dt)
 end
 
 function love.draw()
-    camera:setWindow(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     love.graphics.setBackgroundColor(1,1,1)
     love.graphics.setColor(0,0,0)
-    love.graphics.print(love.timer.getFPS(), 400, 100)
-    camera:draw(function()
-        ObjectMaker.renderObjects()
+    love.graphics.print(love.timer.getFPS(), camera:toScreen(400, 100))
+    camera:setWindow(0, 0, windowSize.x, windowSize.y)
+    camera:draw(function(l, t, w, h)
+        objectMaker.renderObjects(l, t, w, h)
     end)
+end
+
+function love.resize(w, h)
+    windowSize.x = w
+    windowSize.y = h
 end
