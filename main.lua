@@ -9,6 +9,7 @@ local gamera = require "modules.gamera"
 
 local windowSize = conf.windowSize
 local currentWindowSize = vector2.new(windowSize.x, windowSize.y)
+local font
 
 local cursorImage
 local cursorPos
@@ -19,6 +20,8 @@ local objects = {}
 local camera
 
 function love.load()
+    font = love.graphics.newFont("assets/fonts/gameplay.ttf", 36)
+
     love.physics.setMeter(24)
     world = love.physics.newWorld(0, 9.81*24, true)
     camera = gamera.new(0, 0, windowSize.x, windowSize.y)
@@ -62,10 +65,10 @@ function love.load()
         color = {0, 0, 0}
     })
 
-    for i = 1, 200, 1 do
+    for i = 1, 300, 1 do
         local newObject = objectMaker.create({
-            body = love.physics.newBody(world, 800/2, 100, "dynamic"),
-            shape = love.physics.newRectangleShape(math.random(10, 30), math.random(20, 40)),
+            body = love.physics.newBody(world, 1 * i, 100, "dynamic"),
+            shape = love.physics.newCircleShape(math.random(3, 10)),
             color = {0, 0, 0},
             zindex = -10
         })
@@ -92,7 +95,9 @@ end
 function love.draw()
     love.graphics.setBackgroundColor(1,1,1)
     love.graphics.setColor(0,0,0)
-    love.graphics.print(love.timer.getFPS(), camera:toScreen(400, 100))
+    love.graphics.setFont(font)
+    local textPosX, textPosY = camera:toScreen(0, 75)
+    love.graphics.printf("FPS: "..love.timer.getFPS(), textPosX, textPosY, 800, "center")
     camera:setWindow(0, 0, windowSize.x, windowSize.y)
     camera:draw(function(l, t, w, h)
         objectMaker.renderObjects(l, t, w, h)
