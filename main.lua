@@ -65,7 +65,7 @@ function love.load()
         color = {0, 0, 0}
     })
 
-    for i = 1, 300, 1 do
+    for i = 1, 400, 1 do
         local newObject = objectMaker.create({
             body = love.physics.newBody(world, 1 * i, 100, "dynamic"),
             shape = love.physics.newCircleShape(math.random(3, 10)),
