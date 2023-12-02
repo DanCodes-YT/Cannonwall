@@ -5,6 +5,7 @@ data.windowSize = vector2.new(800, 400)
 
 function love.conf(t)
     t.window.title = "Cannonwall"
+    t.console = false
     t.window.vsync = 1
     t.window.width = data.windowSize.x
     t.window.height = data.windowSize.y
